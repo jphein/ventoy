@@ -1,0 +1,22 @@
+{
+    "persistence": [
+        {
+            "image": "/ubuntu-24.04.3-desktop-amd64.iso",
+            "backend": "/persistence/ubuntu.dat",
+            "autosel": 1,
+            "timeout": 5
+        },
+        {
+            "image": "/realmwatch-os-2.0.iso",
+            "backend": "/persistence/realmwatch.dat",
+            "autosel": 1,
+            "timeout": 5
+        },
+        {
+            "image": "/kali-linux-2026.1-live-amd64.iso",
+            "backend": "/persistence/kali.dat",
+            "autosel": 1,
+            "timeout": 5
+        }
+    ]
+}
