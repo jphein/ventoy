@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git add (-A|\\.)($| )'; then echo 'BLOCKED: Use selective git add with specific files, not git add -A or git add . (per CLAUDE.md Commit Protocol)' >&2; exit 2; fi",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_FILE_PATHS\" | grep -q '/venv/'; then echo 'BLOCKED: Do not modify files in venv/ — use pip install instead' >&2; exit 2; fi",
+            "timeout": 3000
+          }
+        ]
+      }
+    ]
+  }
+}

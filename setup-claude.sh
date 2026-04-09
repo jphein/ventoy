@@ -29,30 +29,61 @@ else
 fi
 
 # --- Claude Code settings ---
-mkdir -p ~/.claude
+mkdir -p ~/.claude/commands
 
-# Bypass permissions by default
+# Find the Ventoy mount (works whether booted from Ventoy or running from desktop)
+VENTOY_DIR=""
+for d in /media/*/Ventoy /cdrom /run/live/medium; do
+    if [[ -d "$d/claude-config" ]]; then
+        VENTOY_DIR="$d"
+        break
+    fi
+done
+
+# Also check the repo directory (if cloned)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [[ -d "$SCRIPT_DIR/claude-config" ]]; then
+    VENTOY_DIR="$SCRIPT_DIR"
+fi
+
+# Settings.json — model, permissions, plugins
 cat > ~/.claude/settings.json << 'SETTINGS'
 {
+    "env": {
+        "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    },
+    "permissions": {
+        "defaultMode": "bypassPermissions"
+    },
     "model": "claude-opus-4-6",
     "reasoning_effort": "max",
-    "permissions": {
-        "allow": [
-            "Bash(*)",
-            "Read(*)",
-            "Write(*)",
-            "Edit(*)",
-            "Glob(*)",
-            "Grep(*)",
-            "WebSearch(*)",
-            "WebFetch(*)",
-            "Agent(*)"
-        ],
-        "deny": []
-    }
+    "statusLine": {
+        "type": "command",
+        "command": "jq -r '\"ctx: \" + ((.context_window_tokens_used / .context_window_total_tokens * 100) | floor | tostring) + \"%\"'"
+    },
+    "voiceEnabled": true,
+    "skipDangerousModePermissionPrompt": true
 }
 SETTINGS
-ok "Claude Code: Opus 4.6, max effort, bypass permissions"
+ok "Claude Code: Opus 4.6, max effort, bypass permissions, agent teams"
+
+# Settings.local.json — portable hooks (git add block, venv block)
+if [[ -n "$VENTOY_DIR" ]] && [[ -f "$VENTOY_DIR/claude-config/settings.local.json" ]]; then
+    cp "$VENTOY_DIR/claude-config/settings.local.json" ~/.claude/settings.local.json
+    ok "Hooks installed (git-add block, venv protection)"
+fi
+
+# CLAUDE.md — coding style, conventions, preferences
+if [[ -n "$VENTOY_DIR" ]] && [[ -f "$VENTOY_DIR/claude-config/CLAUDE.md" ]]; then
+    cp "$VENTOY_DIR/claude-config/CLAUDE.md" ~/.claude/CLAUDE.md
+    ok "CLAUDE.md installed"
+fi
+
+# Custom slash commands
+if [[ -n "$VENTOY_DIR" ]] && [[ -d "$VENTOY_DIR/claude-config/commands" ]]; then
+    cp "$VENTOY_DIR/claude-config/commands"/*.md ~/.claude/commands/ 2>/dev/null
+    ok "Custom commands installed: $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l) commands"
+fi
 
 # --- Provider selection ---
 echo ""
