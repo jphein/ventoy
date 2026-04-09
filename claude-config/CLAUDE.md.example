@@ -1,0 +1,9 @@
+# CLAUDE.md
+
+Place your personal CLAUDE.md here. The setup script will copy it to ~/.claude/CLAUDE.md on first boot.
+
+This file is gitignored — copy your own CLAUDE.md to claude-config/CLAUDE.md before building the USB:
+
+    cp ~/.claude/CLAUDE.md claude-config/CLAUDE.md
+
+See https://docs.anthropic.com/en/docs/claude-code for CLAUDE.md documentation.

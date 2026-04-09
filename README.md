@@ -122,4 +122,4 @@ Copy `ventoy.json` to `/media/$USER/Ventoy/ventoy/ventoy.json` on the USB drive.
 
 ## License
 
-MIT
+GPL-3.0 — see [LICENSE](LICENSE)
