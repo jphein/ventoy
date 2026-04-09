@@ -4,9 +4,13 @@ Automated ISO management and live-boot Claude Code setup for a [Ventoy](https://
 
 ## What's included
 
-- **`update-isos.sh`** — checks 10 bootable ISOs for updates, downloads newest versions, cleans old from `~/Downloads`, and syncs to a mounted Ventoy drive
-- **`setup-claude.sh`** — first-boot script that installs Claude Code CLI with your choice of provider and bypass permissions on any persistent live session
+- **`update-isos.sh`** — checks 11 bootable ISOs for updates, downloads newest versions, cleans old from `~/Downloads`, and syncs to a mounted Ventoy drive
+- **`setup-claude.sh`** — first-boot script that installs Claude Code CLI with your choice of provider, Opus 4.6 at max effort, bypass permissions, and full config
 - **`ventoy.json`** — Ventoy persistence plugin config mapping ISOs to their persistence images
+- **`claude-config/`** — portable Claude Code configuration:
+  - `CLAUDE.md` — coding style, conventions, git workflow, working preferences
+  - `settings.local.json` — portable hooks (blocks `git add -A`, protects venv/)
+  - `commands/` — 7 custom slash commands (audit, housekeep, patrol, quest, realm, scout, verify-fixes)
 
 ## Managed ISOs
 
@@ -55,8 +59,21 @@ Automated ISO management and live-boot Claude Code setup for a [Ventoy](https://
    - **AWS Bedrock** — enter AWS access key + secret
    - **Google Vertex AI** — GCP project ID + `gcloud auth`
    - **Azure AI Foundry** — endpoint URL + API key
-4. Run `claude` — it's configured with bypass permissions
+4. Run `claude` — configured with Opus 4.6, max reasoning effort, bypass permissions, agent teams, and your custom commands
 5. Reboot anytime — your setup persists
+
+### What gets installed
+
+The setup script configures a complete Claude Code environment:
+
+- **Model**: `claude-opus-4-6` with `reasoning_effort: max`
+- **Permissions**: full bypass (all tools auto-approved)
+- **Agent teams**: enabled via `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`
+- **Voice**: enabled for speech-to-cli integration
+- **Status line**: context window usage percentage
+- **Hooks**: blocks `git add -A`/`git add .`, protects venv/ from edits
+- **CLAUDE.md**: coding conventions, git workflow, commit protocol
+- **Slash commands**: `/audit`, `/housekeep`, `/patrol`, `/quest`, `/realm`, `/scout`, `/verify-fixes`
 
 ## Persistence
 
