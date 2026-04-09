@@ -34,6 +34,8 @@ mkdir -p ~/.claude
 # Bypass permissions by default
 cat > ~/.claude/settings.json << 'SETTINGS'
 {
+    "model": "claude-opus-4-6",
+    "reasoning_effort": "max",
     "permissions": {
         "allow": [
             "Bash(*)",
@@ -50,7 +52,7 @@ cat > ~/.claude/settings.json << 'SETTINGS'
     }
 }
 SETTINGS
-ok "Claude Code permissions set to bypass"
+ok "Claude Code: Opus 4.6, max effort, bypass permissions"
 
 # --- Provider selection ---
 echo ""
