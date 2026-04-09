@@ -5,7 +5,7 @@ Automated ISO management and live-boot Claude Code setup for a [Ventoy](https://
 ## What's included
 
 - **`update-isos.sh`** — checks 10 bootable ISOs for updates, downloads newest versions, cleans old from `~/Downloads`, and syncs to a mounted Ventoy drive
-- **`setup-claude.sh`** — first-boot script that installs Claude Code CLI with AWS Bedrock and bypass permissions on any persistent live session
+- **`setup-claude.sh`** — first-boot script that installs Claude Code CLI with your choice of provider and bypass permissions on any persistent live session
 - **`ventoy.json`** — Ventoy persistence plugin config mapping ISOs to their persistence images
 
 ## Managed ISOs
@@ -49,8 +49,13 @@ Automated ISO management and live-boot Claude Code setup for a [Ventoy](https://
    ```bash
    bash /media/*/Ventoy/setup-claude.sh
    ```
-3. Enter your AWS Bedrock credentials when prompted
-4. Run `claude` — it's configured with bypass permissions and Bedrock provider
+3. Pick your provider:
+   - **Claude Pro/Teams/Max** — browser OAuth login (easiest, no keys needed)
+   - **Anthropic API** — paste your API key
+   - **AWS Bedrock** — enter AWS access key + secret
+   - **Google Vertex AI** — GCP project ID + `gcloud auth`
+   - **Azure AI Foundry** — endpoint URL + API key
+4. Run `claude` — it's configured with bypass permissions
 5. Reboot anytime — your setup persists
 
 ## Persistence
