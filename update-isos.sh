@@ -365,36 +365,54 @@ sync_ventoy() {
 
     log "Ventoy free space: $((free_kb / 1024 / 1024))G"
 
-    # Map of download filename glob → ventoy filename pattern
-    # For each ISO in downloads, copy to ventoy if newer or missing
+    # Managed ISO families — each entry is a glob that matches one "family" of ISO.
+    # The sync will keep exactly one version per family on the Ventoy drive.
+    local -A ISO_FAMILIES=(
+        ["ubuntu"]="ubuntu-*-desktop-amd64.iso"
+        ["win11"]="Win11_*.iso"
+        ["netbootxyz"]="netboot.xyz*.iso"
+        ["memtest"]="memtest86plus-*.iso"
+        ["tails"]="tails-*.img"
+        ["kali"]="kali-linux-*-live-amd64.iso"
+        ["gparted"]="gparted-live-*.iso"
+        ["hirens"]="hirens-bootcd-pe*.iso"
+        ["clonezilla"]="clonezilla-live-*.iso"
+        ["chromeos"]="chromeos-flex-*.img"
+    )
+
     local count=0
     for src in "$DOWNLOAD_DIR"/*.iso "$DOWNLOAD_DIR"/*.img; do
         [[ -f "$src" ]] || continue
         local base
         base=$(basename "$src")
-        # Skip non-bootable ISOs we don't manage
-        case "$base" in
-            ubuntu-*|Win11_*|netboot.xyz*|memtest86plus-*|tails-*|kali-linux-*|gparted-live-*|hirens-bootcd-*|clonezilla-live-*|chromeos-flex-*) ;;
-            *) continue ;;
-        esac
+
+        # Find which family this file belongs to
+        local family="" family_glob=""
+        for fam in "${!ISO_FAMILIES[@]}"; do
+            # shellcheck disable=SC2254
+            case "$base" in
+                ${ISO_FAMILIES[$fam]}) family="$fam"; family_glob="${ISO_FAMILIES[$fam]}"; break ;;
+            esac
+        done
+        [[ -z "$family" ]] && continue
 
         local dest="$VENTOY_MOUNT/$base"
 
-        # Check if ventoy has an older version (different filename with same prefix)
-        local prefix
-        prefix=$(echo "$base" | sed -E 's/[-_][0-9].*//')
-        # Remove old versions on Ventoy with the same prefix
-        while IFS= read -r -d '' old; do
-            if [[ "$(basename "$old")" != "$base" ]]; then
-                log "Ventoy: removing old $(basename "$old")"
-                $DRY_RUN || rm -f "$old"
-            fi
-        done < <(find "$VENTOY_MOUNT" -maxdepth 1 \( -name "${prefix}*.iso" -o -name "${prefix}*.img" \) -print0 2>/dev/null)
-
+        # Check if Ventoy already has this exact file (same name + size)
         if [[ -f "$dest" ]] && [[ $(stat -c%s "$src") -eq $(stat -c%s "$dest") ]]; then
             ok "Ventoy: $base (up to date)"
             continue
         fi
+
+        # Remove old versions of this family from Ventoy (frees space before copy)
+        while IFS= read -r -d '' old; do
+            if [[ "$(basename "$old")" != "$base" ]]; then
+                log "Ventoy: removing old $(basename "$old")"
+                $DRY_RUN || rm -f "$old"
+                # Recalculate free space after deletion
+                free_kb=$(df --output=avail "$VENTOY_MOUNT" | tail -1 | tr -d ' ')
+            fi
+        done < <(find "$VENTOY_MOUNT" -maxdepth 1 \( -name "$family_glob" \) -print0 2>/dev/null)
 
         local size_kb
         size_kb=$(($(stat -c%s "$src") / 1024))
@@ -410,7 +428,7 @@ sync_ventoy() {
             cp "$src" "$dest"
             sync
             ok "Ventoy: copied $base"
-            free_kb=$((free_kb - size_kb))
+            free_kb=$(df --output=avail "$VENTOY_MOUNT" | tail -1 | tr -d ' ')
         fi
         ((count++))
     done

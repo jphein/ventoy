@@ -81,7 +81,7 @@ Ventoy persistence lets live sessions save changes across reboots. Three 4GB per
 
 | ISO | Persistence image | Label |
 |-----|-------------------|-------|
-| Ubuntu 24.04 LTS | `persistence/ubuntu.dat` | `casper-rw` |
+| Ubuntu 24.04.4 LTS | `persistence/ubuntu.dat` | `casper-rw` |
 | RealmWatch OS 2.0 | `persistence/realmwatch.dat` | `casper-rw` |
 | Kali Linux 2026.1 | `persistence/kali.dat` | `persistence` |
 
