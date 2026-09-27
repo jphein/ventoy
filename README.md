@@ -122,4 +122,4 @@ Copy `ventoy.json` to `/media/$USER/Ventoy/ventoy/ventoy.json` on the USB drive.
 
 ## License
 
-GPL-3.0 — see [LICENSE](LICENSE)
+AGPL-3.0-or-later © 2026 Jeffrey Pine Hein. See [LICENSE](LICENSE).
